@@ -1,0 +1,225 @@
+v1.7.1
+- Kept only the Insert pause action from v1.7.0. Removed pose presets, 3D trajectory, interval stretch, preflight report and motion/collision scanning.
+- Insert pause holds component, plane and camera poses, shifts later keys and markers, and supports Undo/Redo including playback-range boundaries.
+- Models saved by v1.7.0 still load; obsolete pose preset data is ignored and omitted on the next save.
+
+v1.6.6
+- Removed the unused Restore button from the Tracks keyframe toolbar.
+
+v1.6.5
+- Renamed the Tracks toolbar action from Add components to Add track; its selection and add-all behavior is unchanged.
+- Arranged the four thematic toolbar groups side by side, with responsive wrapping and no toolbar scrolling.
+- Enabled sequential write-block playback and seeking for any active assembly mating condition, including Tangent, while leaving those conditions unchanged.
+
+v1.6.4
+- Detects active Align assembly conditions in the current model.
+- With Align enabled, key navigation, playback, scenario playback, and export apply successive poses through V261 WriteBlock.ExecuteTask/AppendTask instead of resetting each preview from the initial ApplyLoop state.
+- The sequential poses share one native Undo step, while Align conditions stay enabled and unchanged.
+- Models without active Align retain the previous ApplyLoop path.
+
+v1.6.3
+- Jumping between distant keys now applies intermediate evaluated poses, matching slow timeline scrubbing for constrained assemblies.
+- Playback and scenario playback apply missed poses even without video capture when SpaceClaim skips native frame callbacks.
+- A timeline jump uses one ApplyLoop so the intermediate placements form one Undo operation.
+- The viewport is explicitly repainted after applying poses and at playback completion.
+
+v1.6.2
+- Playback and scenario playback now apply the exact final frame before completing, even when SpaceClaim skips an update under load.
+- Video export renders skipped intermediate frames before encoding, keeping every requested output frame in sequence without duplicating frame zero.
+- Clicking a key no longer retimes it due to small mouse jitter; dragging requires the left button and at least 10 px of movement.
+
+v1.6.1
+- Organized Tracks controls into Animations, Components, Keyframes, and Timeline & view groups without wheel-scrolling the toolbar.
+- Reverse Duplicate now mirrors Show, Hide, Fade in, and Fade out keys as well as motion and markers.
+- Reverse copies evaluate visibility backward in time so Fade runs before the mirrored key without inserting motion keys.
+- Persisted reverse-visibility playback with each animation and preserved it through track Undo/Redo.
+
+v1.6.0
+- Added a model-embedded Scenario list for ordering and repeating existing animations, including duplicate entries.
+- Added finite repeat count (1-20) and a there-and-back mode that replays the clips in reverse order and reverse time without rewriting their keys.
+- Added scenario playback and MP4/AVI export from Tracks, with active-step status and Esc cancellation.
+- Scenario references follow animation renames, are removed when an animation is deleted, and participate in Undo/Redo.
+- Existing v3 animation libraries remain readable; the library format is now v4.
+
+v1.5.2
+- Pinned the time ruler and its marker/playhead display to the top of the Tracks canvas during vertical scrolling.
+- Ruler mouse interactions now use its fixed screen position while track rows continue to scroll normally.
+
+v1.5.1
+- Dragging the left mouse button across the upper time ruler now scrubs the playhead continuously, snapped to the animation FPS.
+- Scrubbing starts only on the ruler; clicking and dragging component-track keys keeps its existing selection and key-move behavior.
+
+v1.5.0
+- Added track search, selected-component and favorites filters, persistent favorite stars, and double-click selection of a track's object in SpaceClaim.
+- Added named timeline markers with navigation and Set In/Set Out actions. Markers persist per animation and support Undo/Redo.
+- Added Duplicate animation with optional reversed component, plane, and camera motion. Reversal mirrors marker and playback-range times and swaps global Ease In/Out.
+- Reversal is blocked for animations with visibility events until those events can be reversed faithfully; ordinary duplication preserves them.
+
+v1.4.6
+- Reused one context menu for the Tracks panel instead of creating and disposing it during mouse-message handling.
+- Opened the menu after the right mouse button is released, avoiding disposal/reopening while Windows is still processing the previous click.
+- Disposed replaced menu items when rebuilding the menu.
+
+v1.4.5
+- Added Fade out visibility keys. The body becomes transparent over the animation's Fade duration, then remains hidden until the next visibility key.
+- Moved visibility choice and Fade duration from the Tracks toolbar to the keyframe context menu.
+- Right-click a key to edit its time, visibility, Fade duration, copy/paste, update or delete it. Right-click empty timeline space to add or paste at that time.
+
+v1.4.4
+- Fade in now updates the body's color alpha through the installed V261 appearance layer on every frame.
+- Restores the original color override and body style after fading; keeps the RGB blend as a fallback if direct alpha access fails.
+- Fade starts at zero opacity and interpolates over the configured Fade (s) duration.
+
+v1.4.3
+- Added per-animation Fade (s) duration in Tracks, saved in the model with a 0.4 s default for older animations.
+- Fade in now blends body RGB colors through many intermediate shades toward the viewport background while using the native Transparent style.
+- Restores the previous color and style after the transition without overwriting later manual edits.
+
+v1.4.2
+- Fade in now has a visible 0.4-second stepped transition during playback and timeline seeking.
+- Body style is captured only for the transient transparent phase; ordinary Show/Hide and seeking no longer restore a stale style.
+- Native body-style changes made between timeline actions remain in place.
+
+v1.4.1
+- Added compact icons to the Tracks buttons.
+- Kept open dropdown lists stable during periodic panel refresh and switched animations only after a committed choice.
+- Applied Show/Hide to rendered body occurrences instead of only the part master.
+- Replaced ineffective color-alpha Fade with a short V261 transparent-style phase; restored the original body style afterward.
+
+v1.4.0
+- Removed accidental wheel scrolling from the Tracks button bar and resized it to fit wrapped controls.
+- Moved per-track locking to a clickable padlock in each track label.
+- Added movable DatumPlane tracks; manually enable SpaceClaim Clipping on a plane before animating it.
+- Added Show/Hide visibility keys for plane and single-instance component tracks, plus a short component Fade in.
+- Saved plane and visibility keys in the model, with retime and Undo/Redo support.
+v1.3.0
+- Add components initializes an empty animation at time zero, replacing Set Start.
+- First-track additions, later track additions, and track/animation deletion support Undo/Redo.
+- Ribbon removes duplicate keyframe commands and the old keyframe slider; track editing remains in Tracks.
+- The Ribbon Smooth setting now governs every component and camera key; old per-key overrides are ignored.
+v1.2.0
+- Added Undo/Redo for deleting component tracks and animations, including the last track or animation.
+- Added timeline zoom buttons and Ctrl+wheel zoom while preserving ordinary vertical wheel scrolling.
+- Added per-track locking and per-key outgoing Linear/Smooth/Ease In/Ease Out transitions.
+- Added In/Out playback and export range, plus Full range reset.
+- Captured an independent initial component/camera view per animation and added Save start.
+- Added Animate camera switch; disabled camera motion keeps camera keys intact.
+- Saved new settings in the embedded document and retained old recording compatibility.
+v1.1.0
+- Added Remove track for a selected component in the current animation, with confirmation.
+- Added Delete animation for the selected named animation, with confirmation.
+- Deleting the last animation leaves an empty Animation 1 slot for Set Start.
+- Other model components, animations and their tracks are preserved.
+v1.0.1
+- Track labels now use the instantiated part's DisplayName from the SpaceClaim Structure tree.
+- Keeps a custom component instance name as a suffix and widens labels with a full-name hover tip.
+- No animation data migration or keyframe changes are needed; names are read live from the model.
+v1.0.0
+- Added named animations per SpaceClaim document, with selection, New and Rename in Tracks.
+- Set Start and Clear now affect only the selected animation; playback and export use it.
+- Added Add components to extend the selected animation at the playhead without changing existing keys.
+- Added version 3 embedded library format and automatic migration of version 1/2 single-animation documents.
+- Kept the previous ribbon, sparse tracks, Undo/Redo and video export behavior.
+v0.9.0
+- Added multi-key selection by Ctrl+click or marquee drag in Tracks.
+- Dragging a selected marker moves the whole selection with frame snapping; occupied or out-of-range targets reject the entire edit.
+- Added group Delete and Copy/Paste at the playhead, retaining track and time offsets.
+- Added session Undo/Redo for key edits, with a 50-operation limit and cleared history on Set Start or document switch.
+- Preserved the embedded animation format and V261 Ribbon workflow.
+v0.8.2
+- Replaced native AVI capture during export with per-frame PNG scene export through Window.Export.
+- Encodes the PNG sequence as H.264 MP4 or Motion JPEG AVI at the animation's exact duration.
+- Preserves the first keyframe as frame zero and cleans temporary PNGs after export or cancel.
+- Verified image-sequence encoding using the user's crisp SpaceClaim PNG; actual V261 host export requires installation test.
+v0.8.1
+- Fixed video timing: SpaceClaim's fixed 10 fps AVI tag no longer controls the exported duration.
+- Every captured frame now gets an equal share of the animation's timeline duration divided by Speed.
+- Increased MP4 encoder quality and Motion JPEG quality to preserve detail from SpaceClaim's capture.
+- Verified a 73-frame user AVI exports as a one-second, 73-frame MP4 and AVI.
+v0.8.0
+- Fixed unsupported AVI playback caused by SpaceClaim's legacy Microsoft Video 1 (CRAM) capture codec.
+- Export Video now defaults to H.264 MP4 and also offers Motion JPEG AVI.
+- Uses FFmpeg bundled with Ansys V261; native SpaceClaim AVI is an intermediate file only.
+- Confirmed conversion and decoding with the user's 185-frame AVI; no encoder executable is redistributed.
+v0.7.1
+- Fixed mouse wheel regression: ordinary wheel always scrolls component tracks vertically.
+- Horizontal wheel and Shift+wheel now seek the animation time backward/forward.
+- Left-click on the timeline continues to seek directly to that time.
+- The time view follows the playhead when wheel navigation moves beyond the visible area.
+v0.7.0
+- Mouse wheel over the timeline scrolls horizontally through time; wheel over track names scrolls vertically, and Shift+wheel always scrolls time.
+- Component labels remain visible while scrolling horizontally.
+- Added Export AVI using SpaceClaim V261 native video capture of the active window.
+- Export records one playthrough even when Loop is enabled; Cancel stops recording.
+- MP4 is not supported by the V261 native video API and is deferred.
+v0.6.0
+- Tracks button now toggles the docked panel.
+- Drag a diamond with the left mouse button to retime only that track's key, snapped to the current FPS.
+- Added Dark/Light Tracks theme in Ribbon Settings, saved per Windows user.
+- Set Start captures selected components, or all components if none are selected.
+- Keyframe recording after Set Start remains limited to the recorded component subset.
+- Added retiming collision/merge tests against the V261 geometry API.
+v0.5.0
+- Added a docked bottom Tracks panel with separate component and camera rows.
+- Added single-track Add/Update/Delete, key selection, time seeking, and Restore for accidental moves.
+- Interpolates sparse component and camera keys independently.
+- Extended embedded document format to v2 while reading v1 recordings.
+- Release build and validation status: see VALIDATION_RU.md.
+v0.4.1
+- Fixed save-time write-block error: embed animation properties during edits inside a V261 WriteBlock.
+- DocumentSaving now only checks whether the latest snapshot was embedded; it makes no model writes.
+- Navigation writes placement and current keyframe data in the same write block.
+- Documented opening the model without the add-in and the required host test.
+- Release build and host validation status: see VALIDATION_RU.md.
+v0.4.0
+- Embedded complete animation projects in hidden SpaceClaim document custom properties on Save.
+- Restored component tracks via persistent monikers when a model is reopened.
+- Tracked per-document projects and marked animation edits as document modifications.
+- Added compressed, checksummed, chunked format and validation before restore.
+- Release build: 0 warnings, 0 errors; V261 Ribbon XSD and 236 numerical assertions passed.
+- Actual SpaceClaim Save/Close/Open cycle remains to be tested in the host application.
+v0.3.2
+- Added FPS spin box (1-120) and Speed selector (0.25x-4x) to Ribbon Timing group.
+- Replaced Smooth checkbox with Linear / Smooth / Ease In / Ease Out selector.
+- Preserved the recorded keyframes when changing playback settings.
+- Built with V261 API: 0 warnings, 0 errors; V261 Ribbon XSD and 198 numerical assertions passed.
+- In-application runtime validation pending.
+v0.3.1
+- Fixed stale Ribbon state by using V261 Command.UpdateFrequency.Always for stateful commands.
+- Updated Smooth and Loop check marks immediately when clicked.
+- Added Update Keyframe to replace the selected multi-component pose while preserving its time and neighboring frames.
+- Cached component liveness for inexpensive idle UI updates; rechecked before mutations.
+- Release build: 0 warnings, 0 errors. V261 Ribbon XSD and 156 numerical assertions passed.
+- Interactive in-application validation pending.
+v0.3.0
+- Added Ribbon Smooth toggle (smoothstep / linear timing).
+- Set Start and Add Keyframe capture all assembly component placements.
+- Added discrete native keyframe slider, current-keyframe label, Previous/Next.
+- Playback, Reset, Cancel and navigation apply the complete assembly snapshot.
+- Deduplicated shared component masters; guarded document changes and deleted components.
+- Capture commands do not open write blocks; navigation owns its write task.
+- Preserved Select/Move, native Animator/ApplyLoop, Cancel allow-list and Ribbon-only UX.
+- Release build: 0 warnings, 0 errors. V261 Ribbon XSD and 134 numerical assertions passed.
+- In-application runtime validation pending.
+v0.2.1
+- Added native Select and Move (Transform) commands to the top Ribbon.
+- Included Cancel in Animation.Start allowedCommands.
+- Replaced SendKeys with documented Animation.Cancel().
+- Fixed vswhere discovery and installation copy-error reporting.
+- Built against installed V261 API: 0 warnings, 0 errors.
+- Validated V261 Ribbon schema and 81 numerical assertions.
+- Interactive SpaceClaim validation remains pending.
+SC Animator V261 v0.2
+- Ribbon-only interface; removed persistent AnimatorForm.
+- Standard Move -> Add Keyframe workflow.
+- Multiple keyframes for one component.
+- Linear position + quaternion SLERP orientation interpolation.
+- Smoothstep easing per segment.
+- Dedicated Cancel (Esc) ribbon button.
+- Play/Pause, Reset, Remove Last, Clear, Loop.
+- Fixed 1.0 s per segment / 30 FPS in this iteration.
+
+
+
+
+

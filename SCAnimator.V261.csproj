@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{33B0F91B-5C64-4DD2-9BD1-426134214C63}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SCAnimator.V261</RootNamespace>
+    <AssemblyName>SCAnimator.V261</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SpaceClaimApiDir Condition="'$(SpaceClaimApiDir)' == '' and '$(AWP_ROOT261)' != ''">$(AWP_ROOT261)\scdm\SpaceClaim.Api.V261</SpaceClaimApiDir>
+    <SpaceClaimApiDir Condition="'$(SpaceClaimApiDir)' == ''">C:\Program Files\ANSYS Inc\v261\scdm\SpaceClaim.Api.V261</SpaceClaimApiDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="SpaceClaim.Api.V261">
+      <HintPath>$(SpaceClaimApiDir)\SpaceClaim.Api.V261.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SpaceClaim.Api.V261.Scripting">
+      <HintPath>$(SpaceClaimApiDir)\..\SpaceClaim.Api.V261.Scripting.DLL</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Core"><HintPath>$(SpaceClaimApiDir)\..\Core.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="Presentation"><HintPath>$(SpaceClaimApiDir)\..\Presentation.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="SpaceClaim.Foundation"><HintPath>$(SpaceClaimApiDir)\..\SpaceClaim.Foundation.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="Commands"><HintPath>$(SpaceClaimApiDir)\..\Commands.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TypeDerivationContracts"><HintPath>$(SpaceClaimApiDir)\..\TypeDerivationContracts.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="System.ValueTuple"><HintPath>$(SpaceClaimApiDir)\..\System.ValueTuple.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="AddIn.cs" />
+    <Compile Include="Commands\PlaybackCommands.cs" /><Compile Include="Commands\PlaybackSettingsCommands.cs" />
+    <Compile Include="Commands\ThemeCommands.cs" />
+    <Compile Include="Commands\ExportVideoCommands.cs" />
+    <Compile Include="Engine\Keyframe.cs" />
+    <Compile Include="Engine\AnimationProject.cs" />
+    <Compile Include="Engine\AnimationLibrary.cs" />
+    <Compile Include="Engine\Scenario.cs" />
+    <Compile Include="Engine\AdvancedEditing.cs" />
+    <Compile Include="Engine\TimelinePause.cs" />
+    <Compile Include="Engine\PlaneAnimation.cs" />
+    <Compile Include="Engine\VisibilityAnimation.cs" />
+    <Compile Include="Engine\TimelineMarkers.cs" />
+    <Compile Include="Engine\TrackEditing.cs" />
+    <Compile Include="Engine\ProjectPersistence.cs" />
+    <Compile Include="Engine\AnimationLibraryPersistence.cs" />
+    <Compile Include="Engine\PlacementInterpolator.cs" />
+    <Compile Include="Engine\TimelineAnimator.cs" />
+    <Compile Include="Engine\SequentialPoseWriter.cs" />
+    <Compile Include="Engine\PlaybackController.cs" />
+    <Compile Include="Engine\VideoTranscoder.cs" />
+    <Compile Include="UI\Icons.cs" />
+    <Compile Include="UI\TimelinePanel.cs" />
+    <Compile Include="UI\ScenarioDialog.cs" />
+    <Compile Include="UI\ThemeSettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="SCAnimator.V261.Manifest.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="README_RU.md" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
+

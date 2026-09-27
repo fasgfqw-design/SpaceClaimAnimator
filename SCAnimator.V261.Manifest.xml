@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<AddIns>
+  <AddIn name="SC Animator V261"
+         description="Ribbon keyframe animator for SpaceClaim API V261. Capture poses made with the standard Move tool."
+         assembly="SCAnimator.V261.dll"
+         typename="SCAnimator.V261.SCAnimatorAddIn"
+         host="SameAppDomain"/>
+</AddIns>
