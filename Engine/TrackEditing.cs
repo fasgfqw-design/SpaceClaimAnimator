@@ -105,6 +105,8 @@ namespace SCAnimator.V261.Engine {
                 componentMonikers.Clear();
                 componentMonikers.AddRange(state.Library.Animations[activeAnimationIndex].Project.Monikers);
                 ProjectSnapshot project = state.Library.Animations[activeAnimationIndex].Project;
+                hinges.Clear();
+                foreach (HingeSnapshot hinge in project.Hinges) hinges.Add(hinge.Clone());
                 framesPerSecond = project.FramesPerSecond; speedMultiplier = project.SpeedMultiplier;
                 fadeDurationSeconds = project.FadeDurationSeconds;
                 SecondsPerSegment = project.SecondsPerSegment; easing = project.Easing; loop = project.Loop;

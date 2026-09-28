@@ -54,6 +54,7 @@ namespace SCAnimator.V261.Engine {
         public readonly List<TimelineMarker> Markers = new List<TimelineMarker>();
         public readonly List<string> FavoriteTracks = new List<string>();
         public readonly List<KeyframeSnapshot> Keyframes = new List<KeyframeSnapshot>();
+        public readonly List<HingeSnapshot> Hinges = new List<HingeSnapshot>();
     }
 
     // Hidden custom document properties travel with the native SpaceClaim file.
@@ -164,6 +165,23 @@ namespace SCAnimator.V261.Engine {
                 foreach (string favorite in snapshot.FavoriteTracks) {
                     writer.WriteStartElement("favorite");
                     writer.WriteAttributeString("id", favorite);
+                    writer.WriteEndElement();
+                }
+                foreach (HingeSnapshot hinge in snapshot.Hinges) {
+                    writer.WriteStartElement("hinge");
+                    writer.WriteAttributeString("name", hinge.Name);
+                    writer.WriteAttributeString("fixed", hinge.FixedId);
+                    writer.WriteAttributeString("moving", hinge.MovingId);
+                    if (!String.IsNullOrEmpty(hinge.AlignId))
+                        writer.WriteAttributeString("align", hinge.AlignId);
+                    if (!String.IsNullOrEmpty(hinge.OwnedAlignId))
+                        writer.WriteAttributeString("ownedAlign", hinge.OwnedAlignId);
+                    writer.WriteAttributeString("ox", Number(hinge.Origin.X));
+                    writer.WriteAttributeString("oy", Number(hinge.Origin.Y));
+                    writer.WriteAttributeString("oz", Number(hinge.Origin.Z));
+                    writer.WriteAttributeString("dx", Number(hinge.Direction.X));
+                    writer.WriteAttributeString("dy", Number(hinge.Direction.Y));
+                    writer.WriteAttributeString("dz", Number(hinge.Direction.Z));
                     writer.WriteEndElement();
                 }
                 foreach (PlaneTrackSnapshot plane in snapshot.PlaneTracks) {
@@ -279,6 +297,7 @@ namespace SCAnimator.V261.Engine {
             bool sawFrame = false, sawInitial = false;
             var markerNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var favoriteIds = new HashSet<string>(StringComparer.Ordinal);
+            var hingeNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             string savedLocks = root.GetAttribute("locks");
             double previousTime = -1;
             foreach (XmlNode node in root.ChildNodes) {
@@ -294,6 +313,28 @@ namespace SCAnimator.V261.Engine {
                     if (String.IsNullOrEmpty(id) || id.Length > 4096 || !favoriteIds.Add(id))
                         throw new InvalidDataException("Invalid favorite track.");
                     snapshot.FavoriteTracks.Add(id);
+                }
+                else if (element.Name == "hinge" && !legacy && !sawFrame) {
+                    string name = element.GetAttribute("name"), fixedId = element.GetAttribute("fixed"),
+                        movingId = element.GetAttribute("moving"), alignId = element.GetAttribute("align"),
+                        ownedAlignId = element.GetAttribute("ownedAlign");
+                    double ox = ParseNumber(element.GetAttribute("ox")),
+                        oy = ParseNumber(element.GetAttribute("oy")), oz = ParseNumber(element.GetAttribute("oz")),
+                        dx = ParseNumber(element.GetAttribute("dx")),
+                        dy = ParseNumber(element.GetAttribute("dy")), dz = ParseNumber(element.GetAttribute("dz"));
+                    double length = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+                    if (String.IsNullOrWhiteSpace(name) || name != name.Trim() || name.Length > 80 ||
+                        String.IsNullOrEmpty(fixedId) || String.IsNullOrEmpty(movingId) ||
+                        fixedId == movingId || fixedId.Length > 4096 || movingId.Length > 4096 ||
+                        !hingeNames.Add(name) || snapshot.Hinges.Count >= 100 ||
+                        length < .999 || length > 1.001 || alignId.Length > 4096 ||
+                        ownedAlignId.Length > 4096 ||
+                        (!String.IsNullOrEmpty(ownedAlignId) && ownedAlignId != alignId))
+                        throw new InvalidDataException("Invalid hinge definition.");
+                    snapshot.Hinges.Add(new HingeSnapshot { Name = name, FixedId = fixedId,
+                        MovingId = movingId, AlignId = alignId, OwnedAlignId = ownedAlignId,
+                        Origin = Point.Create(ox, oy, oz),
+                        Direction = Direction.Create(dx, dy, dz) });
                 }
                 else if (element.Name == "plane" && !legacy && !sawInitial && !sawFrame) {
                     string id = element.GetAttribute("id");

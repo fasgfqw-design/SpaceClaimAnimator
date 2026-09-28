@@ -61,6 +61,7 @@
     <Compile Include="AddIn.cs" />
     <Compile Include="Commands\PlaybackCommands.cs" /><Compile Include="Commands\PlaybackSettingsCommands.cs" />
     <Compile Include="Commands\ThemeCommands.cs" />
+    <Compile Include="Commands\MechanismCommands.cs" />
     <Compile Include="Commands\ExportVideoCommands.cs" />
     <Compile Include="Engine\Keyframe.cs" />
     <Compile Include="Engine\AnimationProject.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Engine\Scenario.cs" />
     <Compile Include="Engine\AdvancedEditing.cs" />
     <Compile Include="Engine\TimelinePause.cs" />
+    <Compile Include="Engine\Mechanisms.cs" />
     <Compile Include="Engine\PlaneAnimation.cs" />
     <Compile Include="Engine\VisibilityAnimation.cs" />
     <Compile Include="Engine\TimelineMarkers.cs" />
@@ -82,6 +84,10 @@
     <Compile Include="UI\Icons.cs" />
     <Compile Include="UI\TimelinePanel.cs" />
     <Compile Include="UI\ScenarioDialog.cs" />
+    <Compile Include="UI\MechanismsDialog.cs" />
+    <Compile Include="UI\MechanismIsolation.cs" />
+    <Compile Include="UI\HingeSuggestionOverlay.cs" />
+    <Compile Include="UI\AlignSuggestionMarker.cs" />
     <Compile Include="UI\ThemeSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

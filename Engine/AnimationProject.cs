@@ -474,7 +474,7 @@ namespace SCAnimator.V261.Engine {
             else ClearEditHistory();
             lockedTracks.Clear(); keyEasing.Clear(); planeTracks.Clear(); visibilityKeys.Clear();
             reversedVisibility = false;
-            timelineMarkers.Clear(); favoriteTracks.Clear();
+            timelineMarkers.Clear(); favoriteTracks.Clear(); hinges.Clear();
             initialPlacements = null; initialCamera = null;
             hasPlaybackRange = false; playbackRangeStart = playbackRangeEnd = 0;
             components.Clear();
@@ -521,6 +521,7 @@ namespace SCAnimator.V261.Engine {
                 CurrentKeyframeIndex = CurrentKeyframeIndex
             };
             snapshot.Monikers.AddRange(componentMonikers);
+            foreach (HingeSnapshot hinge in hinges) snapshot.Hinges.Add(hinge.Clone());
             foreach (PlaneTrack plane in planeTracks) {
                 var saved = new PlaneTrackSnapshot { Moniker = plane.Moniker };
                 foreach (var key in plane.Keys) saved.Keys.Add(new PlaneKeySnapshot { Time = key.Key, Placement = key.Value });
@@ -583,6 +584,7 @@ namespace SCAnimator.V261.Engine {
             foreach (TimelineMarker marker in snapshot.Markers) timelineMarkers.Add(marker.Clone());
             timelineMarkers.Sort((a, b) => a.Time.CompareTo(b.Time));
             foreach (string favorite in snapshot.FavoriteTracks) favoriteTracks.Add(favorite);
+            foreach (HingeSnapshot hinge in snapshot.Hinges) hinges.Add(hinge.Clone());
             // Earlier releases stored optional per-key transitions. The global
             // Ribbon transition is authoritative, including for old documents.
             if (snapshot.LockedTracks != null) lockedTracks.AddRange(snapshot.LockedTracks);

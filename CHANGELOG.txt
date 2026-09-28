@@ -1,3 +1,93 @@
+v1.8.17
+- Render every proposed hinge marker once at creation. The v1.8.13 optimization skipped the default unfocused state, leaving markers that did not move during layout invisible until hovered.
+
+v1.8.16
+- Added inclusive Ø from/to filters in millimeters for proposed Align pairs. They combine with Find and update both the list and visible markers; Add all applies to the filtered set.
+- Swapping fixed/moving faces now updates the displayed diameter and marker axis, so diameter filtering remains correct after a role swap.
+
+v1.8.15
+- Added Max offset mm (0–10 mm, default 0.2 mm) to Mechanisms. Find axes now accepts near-parallel cylindrical axes within that user-selected distance and shows actual offset for every proposal.
+- Native Align creation rechecks the proposal against the chosen offset instead of rejecting every initially non-coaxial pair. The SpaceClaim solver remains responsible for applying the constraint.
+- Kept the axis-group merge tolerance separate from search offset so increasing the offset does not collapse nearby distinct hinge axes into one suggestion.
+
+v1.8.14
+- Manually creating an Align no longer removes every other proposed joint for the same moving component. Only the already linked face pair disappears; distinct Align conditions may share a moving component.
+- Added a Find box for proposed Align pairs. Filtering by component name or diameter updates both the list and visible markers. Add all operates on the filtered set but remains limited to one automatic new hinge per moving component.
+- Includes the fixed-pixel native marker rendering from v1.8.13, avoiding polygon distortion while rotating the camera.
+
+v1.8.13
+- Render proposed hinge markers with V261 PointPrimitive circles of fixed pixel radius instead of camera-facing polygon meshes. This avoids transient ellipse distortion and removes per-vertex mesh rebuilds during camera movement.
+- Defer marker relayout and hover/isolation changes while a mouse button is held during camera manipulation; resume after release. Avoid rebuilding unchanged marker graphics.
+
+v1.8.12
+- For each detected coaxial axis, compare all cylindrical face pairs and retain the nearest close-fitting pair rather than the first one encountered. Bulk Add all also prefers the nearest fitting partner for each moving component.
+- Place each marker in the shared axial overlap of the chosen faces, or halfway between their nearest ends when they do not overlap. This keeps markers near the actual connection in models such as EVAN.scdocx.
+
+v1.8.11
+- Find axes with no selection now searches all sibling groups throughout the assembly hierarchy. A top-level assembly with only one direct component no longer stops the scan.
+- Bulk detection examines up to 512 cylindrical faces per component instead of 100 (two-component search remains at 2000). This covers the larger parts in EVAN.scdocx.
+
+v1.8.10
+- Reduced the blue fixed-face fill opacity from 190 to 135; the orange moving-face fill is unchanged.
+- Removed Record rotation, its end-time/contact controls, and the unused baking/contact-limiter implementation. Create Align still adds a starting track; record later poses with Move and Add key in Tracks.
+
+v1.8.9
+- Marker hover and single-click row selection now use the same blue/orange face preview and temporary isolation of the fixed/moving pair. Preview visibility is restored when no proposal is active.
+- A marker is placed on the common axis midway between the proposed faces. Coincident markers form a compact regular polygon in screen space.
+- Add all selects one close-fitting Align per moving component instead of discarding every component with alternative pairings. The dialog distinguishes possible face pairings from independent hinges and reports failures.
+- Renamed Capture Move to Record rotation: native Align keeps the axes coaxial, while this action records the Move rotation as timed animation keys.
+
+v1.8.8
+- Hovering a proposed marker only previews its faces. Creation now requires a completed left click on the same marker, a double click on a proposal row, Create Align, or Add all; selection/preselection events cannot create joints.
+- The face overlay uses the body's tessellated triangles, renders a stronger blue fixed and orange moving fill slightly in front of the model, and falls back to native face highlighting when tessellation is unavailable.
+- Added Isolate selected pair in Mechanisms. Selecting a proposal can temporarily hide other bodies; changing proposals switches the pair. Visibility values are restored on toggle-off, before creating Align, and when closing the dialog.
+
+v1.8.7
+- Marker positions are separated by a fixed pixel distance in the current view. Hover and click resolve the nearest marker from the cursor position, so one overlapping SpaceClaim preselection cannot stand in for every candidate.
+- Replaced point-only hit testing with a visible, selectable circular mesh covering the whole marker.
+- The hovered pair is added to SpaceClaim's native secondary face selection so the actual two faces highlight. Only the current pair is selected; the user's previous secondary selection is restored on close.
+- Face-fill tessellation also checks the display body's full face map when a direct face lookup is unavailable.
+
+v1.8.6
+- Hovering a proposed Align marker now paints the two actual cylindrical faces with translucent blue/orange tessellated overlays; colored outlines remain as backup when tessellation is unavailable.
+- Suggestions whose marker centers coincide are arranged around their shared center in the current camera plane. The layout updates when the view rotates or zooms, keeping each suggestion independently hoverable and clickable.
+
+v1.8.5
+- Hovering over a proposed Align marker highlights the fixed face in blue and the moving face in orange; the status text names both components. Marker click still creates the proposed Align.
+- Remove joint deletes the native Align created by SC Animator together with its animation hinge. If the Align was reused, inherited from v1.8.4 without ownership data, or shared by another animation, it remains. Previously captured keyframes remain.
+- The owned Align identifier is stored in the animation data so removal still works after saving and reopening the model.
+
+v1.8.4
+- Added prominent selectable green axis markers for proposed coaxial pairs. Clicking a marker creates that pair without searching the list.
+- Proposed joints now create a native SpaceClaim Align condition through the V261 AlignCondition.Create API and an associated SC Animator hinge for Capture Move.
+- Reuses an enabled Align already referencing the same two faces. The green Add all action creates native Align conditions only for unambiguous, nonconflicting pairs.
+- Unlink animation removes only the animator hinge; the native Align remains in the SpaceClaim Structure tree for separate editing or deletion.
+- Thin cyan/gold face outlines remain as secondary context and do not replace model selection.
+
+v1.8.3
+- Replaced bulk secondary face selection in Mechanisms with temporary, nonselectable line graphics based on the V261 lightweight custom object API.
+- Candidate face boundaries use faint cyan one-pixel lines; the list-selected pair uses stronger gold lines. The model's own selection and appearance are left alone.
+- The temporary graphics are removed when the Mechanisms window closes. Viewport clicks still select underlying faces to add hinges.
+
+v1.8.2
+- Made the Mechanisms window modeless so the user can select proposed faces in the SpaceClaim viewport.
+- Highlights detected cylindrical face pairs with V261 secondary selection; selecting a list entry highlights its pair.
+- Clicking a uniquely matched face adds its hinge. For ambiguous faces, a second face or a list entry resolves the candidate.
+- Replaced single Auto add with a green Add all action for unambiguous, close-fitting, nonconflicting pairs; already linked parts are removed from suggestions.
+
+v1.8.1
+- Combined duplicate Detect hinges and Mechanisms Ribbon commands into one Mechanisms button; axis detection runs when the dialog opens.
+- Added Auto add for a selected, unambiguous coaxial pin/hole candidate with radii within 3%; fixed/moving roles remain reviewable.
+- Added a default-on kinematic contact guard to Capture Move. It samples the hinge arc against neighboring bodies, stops before the first new collision, and holds the safe pose to the requested end time.
+- Initial body pairs already in contact are excluded from the guard. This is sampled collision avoidance during capture, not continuous physics, force or friction simulation.
+
+v1.8.0
+- Added a separate Mechanisms Ribbon group with Detect hinges and Mechanisms commands.
+- Detect hinges proposes coaxial cylindrical faces from two selected sibling components, or from a small sibling group; the user confirms fixed and moving roles.
+- Saved hinge definitions are embedded per animation. Adding a hinge anchors the moving component's track at the current time.
+- After a normal SpaceClaim Move, Capture Move verifies rotation about the selected hinge and bakes an arc of editable track keys. Existing keys and other tracks are preserved.
+- No numeric displacement or rotation input was added. End time is the only input for capture.
+
 v1.7.1
 - Kept only the Insert pause action from v1.7.0. Removed pose presets, 3D trajectory, interval stretch, preflight report and motion/collision scanning.
 - Insert pause holds component, plane and camera poses, shifts later keys and markers, and supports Undo/Redo including playback-range boundaries.

@@ -7,8 +7,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("SC Animator")]
 [assembly: ComVisible(false)]
 [assembly: Guid("2f1bd1bb-0c67-49b9-a7a7-32d3e14e4f13")]
-[assembly: AssemblyVersion("1.7.1.0")]
-[assembly: AssemblyFileVersion("1.7.1.0")]
+[assembly: AssemblyVersion("1.8.17.0")]
+[assembly: AssemblyFileVersion("1.8.17.0")]
 
 
 

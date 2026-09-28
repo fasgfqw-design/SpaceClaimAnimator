@@ -12,6 +12,7 @@ namespace SCAnimator.V261 {
         private readonly HashSet<Document> persistedDuringSave = new HashSet<Document>();
         private readonly CommandCapsule[] capsules = new CommandCapsule[] {
             new ShowTimelineCapsule(),
+            new MechanismsCapsule(),
             new PlayPauseCapsule(),
             new CancelAnimationCapsule(),
             new ResetPoseCapsule(),
@@ -79,6 +80,9 @@ namespace SCAnimator.V261 {
         </group>
         <group id=""SCAnimator.V261.KeyframesGroup"" label=""Keyframes"">
           <button id=""SCAnimator.V261.ShowTimeline"" size=""large"" command=""SCAnimator.V261.ShowTimeline""/>
+        </group>
+        <group id=""SCAnimator.V261.MechanismsGroup"" label=""Mechanisms"">
+          <button id=""SCAnimator.V261.Mechanisms"" size=""large"" command=""SCAnimator.V261.Mechanisms""/>
         </group>
         <group id=""SCAnimator.V261.PlaybackGroup"" label=""Playback"">
           <button id=""SCAnimator.V261.PlayPause"" size=""large"" command=""SCAnimator.V261.PlayPause""/>

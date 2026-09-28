@@ -679,6 +679,101 @@ class Verify {
         using (var gzip = new GZipStream(input,CompressionMode.Decompress))
         using (var output = new MemoryStream()) { gzip.CopyTo(output); migratedXml = Encoding.UTF8.GetString(output.ToArray()); }
         Near(migratedXml.Contains("<preset") ? 1 : 0,0,"removed pose feature is not written again");
+        Near(HingeDetector.Coaxial(Point.Origin,Direction.DirZ,
+            Point.Create(0.0001,0,2),Direction.DirZ,.0002) ? 1 : 0,
+            1,"coaxial detector accepts axially separated cylinders");
+        Near(HingeDetector.Coaxial(Point.Origin,Direction.DirZ,
+            Point.Create(.01,0,0),Direction.DirZ,.0002) ? 1 : 0,
+            0,"coaxial detector rejects offset axes");
+        Near(HingeDetector.Coaxial(Point.Origin,Direction.DirZ,
+            Point.Origin,Direction.DirX,.0002) ? 1 : 0,
+            0,"coaxial detector rejects crossing axes");
+        Near(HingeDetector.Coaxial(Point.Origin, Direction.DirZ,
+            Point.Create(.0008, 0, 2), Direction.DirZ, .001) ? 1 : 0,
+            1, "1 mm setting finds axes separated by 0.8 mm");
+        Near(HingeDetector.Coaxial(Point.Origin, Direction.DirZ,
+            Point.Create(.0008, 0, 2), Direction.DirZ, .0005) ? 1 : 0,
+            0, "0.5 mm setting rejects axes separated by 0.8 mm");
+        double faceGap, faceCenterDistance, markerPosition;
+        HingeDetector.AxialRelation(0, 10, 20, 30,
+            out faceGap, out faceCenterDistance, out markerPosition);
+        Near(faceGap, 10, "separated coaxial faces have an axial gap");
+        Near(markerPosition, 15, "marker sits between nearest face ends");
+        HingeDetector.AxialRelation(0, 100, 95, 105,
+            out faceGap, out faceCenterDistance, out markerPosition);
+        Near(faceGap, 0, "overlapping coaxial faces have no axial gap");
+        Near(markerPosition, 97.5, "marker sits in face overlap, not between distant centers");
+        var farFace = new HingeCandidate { Radius = .01, OtherRadius = .01,
+            AxialGap = .02, AxialCenterDistance = .04 };
+        var nearFace = new HingeCandidate { Radius = .01, OtherRadius = .0101,
+            AxialGap = 0, AxialCenterDistance = .003 };
+        Near(HingeDetector.IsCloser(nearFace, farFace) ? 1 : 0, 1,
+            "same-axis proposal prefers nearby matching faces over first encountered");
+        Near(HingeDetector.IsCloser(farFace, nearFace) ? 1 : 0, 0,
+            "distant same-axis face does not replace nearby proposal");
+        var matchingPin = new HingeCandidate { Radius = .01, OtherRadius = .0102 };
+        var tenMm = new HingeCandidate { Radius = .005, OtherRadius = .005 };
+        var twentyMm = new HingeCandidate { Radius = .01, OtherRadius = .01 };
+        Near(tenMm.IsWithinDiameterRange(10, 20) ? 1 : 0, 1,
+            "diameter filter includes 10 mm lower boundary");
+        Near(twentyMm.IsWithinDiameterRange(10, 20) ? 1 : 0, 1,
+            "diameter filter includes 20 mm upper boundary");
+        Near(tenMm.IsWithinDiameterRange(11, 20) ? 1 : 0, 0,
+            "diameter filter excludes smaller cylinders");
+        Near(twentyMm.IsWithinDiameterRange(10, 19) ? 1 : 0, 0,
+            "diameter filter excludes larger cylinders");
+        Near(tenMm.IsWithinDiameterRange(20, 10) ? 1 : 0, 0,
+            "reversed diameter range matches no proposals");
+        var sixPairings = new[] {
+            new AutoHingeOption { Index = 0, FixedId = "1", MovingId = "2",
+                AxisDistance = 0, AxialCenterDistance = 0 },
+            new AutoHingeOption { Index = 1, FixedId = "1", MovingId = "3" },
+            new AutoHingeOption { Index = 2, FixedId = "1", MovingId = "4" },
+            new AutoHingeOption { Index = 3, FixedId = "2", MovingId = "3" },
+            new AutoHingeOption { Index = 4, FixedId = "2", MovingId = "4" },
+            new AutoHingeOption { Index = 5, FixedId = "3", MovingId = "4" }
+        };
+        var independent = AutoHingeSelection.Choose(sixPairings);
+        Near(independent.Count, 3, "six pairings produce three independent hinges");
+        Near(independent.Contains(0) && independent.Contains(1) && independent.Contains(2) ? 1 : 0,
+            1, "automatic choice uses one fixed partner per moving component");
+        sixPairings[2].RadiusMismatch = .04;
+        Near(AutoHingeSelection.Choose(sixPairings).Contains(4) ? 1 : 0, 1,
+            "automatic choice takes another close-fitting pairing when first is unsuitable");
+        sixPairings[1].AxialGap = .02;
+        Near(AutoHingeSelection.Choose(sixPairings).Contains(3) ? 1 : 0, 1,
+            "automatic choice prefers nearest independent coaxial pair");
+        Near(matchingPin.RadiusMismatch < .03 ? 1 : 0,1,
+            "auto hinge accepts matching pin and hole radii");
+        matchingPin.OtherRadius = .012;
+        Near(matchingPin.RadiusMismatch < .03 ? 1 : 0,0,
+            "auto hinge rejects unequal pin and hole radii");
+        var mechanismSaved = ProjectPersistence.Decode(ProjectPersistence.Encode(sourceCopy));
+        mechanismSaved.Hinges.Add(new HingeSnapshot { Name = "Rotor", FixedId = "fixed-id",
+            MovingId = "moving-id", AlignId = "created-align-id", OwnedAlignId = "created-align-id", Origin = Point.Create(.01,.02,.03),
+            Direction = Direction.DirZ });
+        var mechanismLoaded = ProjectPersistence.Decode(ProjectPersistence.Encode(mechanismSaved));
+        Near(mechanismLoaded.Hinges.Count,1,"hinge survives model data roundtrip");
+        Near(mechanismLoaded.Hinges[0].Origin.X,.01,"hinge axis origin survives persistence");
+        Near(mechanismLoaded.Hinges[0].Direction.Z,1,"hinge axis direction survives persistence");
+        Near(mechanismLoaded.Hinges[0].Name == "Rotor" ? 1 : 0,1,
+            "hinge name survives persistence");
+        Near(mechanismLoaded.Hinges[0].OwnedAlignId == "created-align-id" ? 1 : 0,1,
+            "owned SpaceClaim Align identifier survives persistence");
+        Near(mechanismLoaded.Hinges[0].AlignId == "created-align-id" ? 1 : 0,1,
+            "referenced SpaceClaim Align identifier survives persistence");
+        var hingeOnly = new ProjectSnapshot();
+        hingeOnly.Hinges.Add(mechanismLoaded.Hinges[0].Clone());
+        Near(ProjectPersistence.Decode(ProjectPersistence.Encode(hingeOnly)).Hinges.Count,1,
+            "hinge can be saved before any animation track exists");
+        var hingeLibrary = new AnimationLibrarySnapshot();
+        hingeLibrary.Animations.Add(new NamedAnimationSnapshot { Name = "With hinge", Project = mechanismLoaded });
+        hingeLibrary.Animations.Add(new NamedAnimationSnapshot { Name = "Without hinge", Project = sourceCopy });
+        var loadedHingeLibrary = ProjectPersistence.DecodeLibrary(ProjectPersistence.EncodeLibrary(hingeLibrary));
+        Near(loadedHingeLibrary.Animations[0].Project.Hinges.Count,1,
+            "hinge belongs to its own animation");
+        Near(loadedHingeLibrary.Animations[1].Project.Hinges.Count,0,
+            "another animation has no inherited hinge");
         Console.WriteLine("PASS: " + checks + " numerical assertions against real V261 geometry API.");
         return 0;
       } catch (Exception e) { Console.Error.WriteLine(e); return 1; }
